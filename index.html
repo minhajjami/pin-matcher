@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pin Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="pin-generator half-width">
+                    <input id="display-pin" class="form-control" type="text">
+                    <button id="btn-generate" class="generate-btn" onclick=" generatePin()">Generate Pin</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-section half-width">
+                    <input id="user-input" class="form-control" type="text">
+                    <div class="numbers">
+                        <div class="calc-body">
+                            <div class="calc-button-row">
+                              <div class="button" onclick="handleDigits('7')">7</div>
+                              <div class="button" onclick="handleDigits('8')">8</div>
+                              <div class="button" onclick="handleDigits('9')">9</div>
+                            </div>
+                            <div class="calc-button-row">
+                              <div class="button" onclick="handleDigits('4')">4</div>
+                              <div class="button" onclick="handleDigits('5')">5</div>
+                              <div class="button"onclick="handleDigits('6')">6</div>
+                            </div>
+                            <div class="calc-button-row">
+                              <div class="button"onclick="handleDigits('1')">1</div>
+                              <div class="button"onclick="handleDigits('2')">2</div>
+                              <div class="button"onclick="handleDigits('3')">3</div>
+                            </div>
+                            <div class="calc-button-row">
+                                <div class="button"onclick="backSpace()"><</div>
+                                <div class="button"onclick="handleDigits('0')">0</div>
+                                <div class="button"onclick="displayClear()">C</div>
+                            </div>
+                            <div>
+                                <button id="btn-submit" type="submit" class="submit-btn">Submit</button>
+                                <p class="action-left"id="retry">3 try left</p>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="notify-section">
+            <p id="notify-misMatch" class="notify">❌ Pin Didn't Match, Please try again</p>
+            <p id="notify-match" class="notify">✅ Pin Matched... Secret door is opening for you</p>
+        </div>
+    </div>
+    <script>
+
+        let numbers="";
+        
+        function handleDigits(digit){
+           numbers+=digit;
+           let result=parseInt(numbers);
+           document.getElementById('user-input').value=result;
+        }
+
+        function generatePin(){
+            var randomNumber=Math.round(1000 + Math.random() * 9000);
+            document.getElementById('display-pin').value=randomNumber; 
+        }
+
+        document.getElementById('btn-submit').addEventListener('click',function(){
+            var generatePinResult=document.getElementById('display-pin');
+            var generatePinNumber=parseInt(generatePinResult.value);
+
+            var userInputPinResult=document.getElementById('user-input');
+            var userInputPinNumber=parseInt(userInputPinResult.value);
+
+            matchPin(generatePinNumber,userInputPinNumber);
+        });
+
+        function matchPin(generatePinNumber,userInputPinNumber){
+
+            if(generatePinNumber==userInputPinNumber){
+                handleNotification('notify-match',true);
+                handleNotification('notify-misMatch',false);
+                handleNotification('retry',false);
+                retryCount=3;
+            }
+            else{
+                handleNotification('notify-match',false);
+                handleNotification('notify-misMatch',true); 
+                handleWrongPinInput();
+            }
+        }
+
+        function handleNotification(id,isBlock){
+            if(isBlock){
+                document.getElementById(id).style.display = "block";
+            }
+            else{
+                document.getElementById(id).style.display = "none";
+            }
+        }
+
+        let retryCount=3;
+        function handleWrongPinInput(){
+            retryCount=retryCount-1;
+            handleNotification('retry',true);
+
+            if(retryCount>0)
+            {
+                document.getElementById('retry').innerText = retryCount +' try left';
+            }        
+            else
+            {
+                document.getElementById('btn-submit').disabled = true;
+                document.getElementById('btn-generate').disabled = true;
+                document.getElementById('retry').innerText = 'No more retry allowed for this session';
+            }
+        }
+
+        function displayClear(){
+            var userInputResult=document.getElementById('user-input');
+            userInputResult.value="";
+            numbers="";
+        }
+
+        function backSpace(){          
+            numbers = parseInt(numbers/10);
+            if(numbers==0)
+            {
+                numbers = '';
+            }
+            document.getElementById('user-input').value = numbers;       
+        }
+    </script>
+</body>
+</html>
